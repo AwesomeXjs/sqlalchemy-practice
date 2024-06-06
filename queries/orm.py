@@ -1,9 +1,9 @@
 from database import engine_sync, Base, async_session_factory
-from models import WorkersOrm
+from models import WorkersOrm, ResumesOrm
 
 
 def create_tables():
-    engine_sync.echo = False
+    # engine_sync.echo = False
     Base.metadata.drop_all(engine_sync)
     Base.metadata.create_all(engine_sync)
 
@@ -21,4 +21,11 @@ async def async_insert_data():
     async with async_session_factory() as session:
         worker = WorkersOrm(username="New Worker from orm")
         session.add(worker)
+        # resume = ResumesOrm(
+        #     title="New resume",
+        #     compensation=23,
+        #     workload="parttime",
+        #     worker_id=2,
+        # )
+        # session.add(resume)
         await session.commit()

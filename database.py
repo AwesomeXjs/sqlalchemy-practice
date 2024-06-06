@@ -1,12 +1,18 @@
+from typing import Annotated
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, String
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 from config import settings
 
+str256 = Annotated[str, 256]
+
 
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {
+        str256: String(256),
+    }
 
 
 # ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы
