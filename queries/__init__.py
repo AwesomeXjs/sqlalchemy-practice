@@ -1,3 +1,3 @@
-__all__ = "create_tables"
+__all__ = ("create_tables", "insert_data")
 
-from .core import create_tables
+from .core import create_tables, insert_data

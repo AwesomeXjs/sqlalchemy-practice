@@ -1,6 +1,6 @@
-from sqlalchemy import text
+from sqlalchemy import text, insert
 
-from models import metadata
+from models import metadata, workers_table
 from database import engine_sync, engine_async
 
 
@@ -24,4 +24,25 @@ async def get_123_async():
 
 
 def create_tables():
+    engine_sync.echo = False
+    metadata.drop_all(engine_sync)
     metadata.create_all(engine_sync)
+
+
+def insert_data():
+    with engine_sync.connect() as conn:
+        # stmt - insert / update/ delete
+        # сырой запрос:
+        # stmt = """INSERT INTO workers (username) VALUES
+        #         ('Bobr'),
+        #         ('Volk');"""
+
+        # query builder:
+        stmt = insert(workers_table).values(
+            [
+                {"username": "another volk"},
+                {"username": "another bobr"},
+            ]
+        )
+        conn.execute(stmt)
+        conn.commit()
