@@ -9,7 +9,7 @@
         "documentation": {}
     },
     {
-        "label": "create_tables",
+        "label": "SyncCore",
         "importPath": "queries",
         "description": "queries",
         "isExtraImport": true,
@@ -17,7 +17,7 @@
         "documentation": {}
     },
     {
-        "label": "insert_data",
+        "label": "AsyncCore",
         "importPath": "queries",
         "description": "queries",
         "isExtraImport": true,
@@ -25,7 +25,7 @@
         "documentation": {}
     },
     {
-        "label": "async_insert_data",
+        "label": "SyncORM",
         "importPath": "queries",
         "description": "queries",
         "isExtraImport": true,
@@ -33,7 +33,7 @@
         "documentation": {}
     },
     {
-        "label": "get_worker_by_id",
+        "label": "AsyncORM",
         "importPath": "queries",
         "description": "queries",
         "isExtraImport": true,
@@ -65,7 +65,31 @@
         "documentation": {}
     },
     {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "update",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "insert",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -153,6 +177,46 @@
         "documentation": {}
     },
     {
+        "label": "workers_table",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "WorkersOrm",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "ResumesOrm",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "workers_table",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "metadata",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
         "label": "engine_sync",
         "importPath": "database",
         "description": "database",
@@ -169,7 +233,7 @@
         "documentation": {}
     },
     {
-        "label": "engine_sync",
+        "label": "async_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -185,7 +249,15 @@
         "documentation": {}
     },
     {
-        "label": "async_session_factory",
+        "label": "engine_sync",
+        "importPath": "database",
+        "description": "database",
+        "isExtraImport": true,
+        "detail": "database",
+        "documentation": {}
+    },
+    {
+        "label": "sync_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -222,22 +294,6 @@
         "description": "database",
         "isExtraImport": true,
         "detail": "database",
-        "documentation": {}
-    },
-    {
-        "label": "WorkersOrm",
-        "importPath": "models",
-        "description": "models",
-        "isExtraImport": true,
-        "detail": "models",
-        "documentation": {}
-    },
-    {
-        "label": "ResumesOrm",
-        "importPath": "models",
-        "description": "models",
-        "isExtraImport": true,
-        "detail": "models",
         "documentation": {}
     },
     {
@@ -389,14 +445,6 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "Enum",
         "importPath": "enum",
         "description": "enum",
@@ -405,11 +453,19 @@
         "documentation": {}
     },
     {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "SyncCore",
         "kind": 6,
         "importPath": "queries.core",
         "description": "queries.core",
-        "peekOfCode": "class SyncCore:\n    @staticmethod\n    def create_tables(metadata):\n        engine_sync.echo = False\n        metadata.drop_all(engine_sync)\n        metadata.create_all(engine_sync)\n    @staticmethod\n    def insert_data(workers_table):\n        with engine_sync.connect() as conn:\n            # stmt - insert / update/ delete",
+        "peekOfCode": "class SyncCore:\n    @staticmethod\n    def create_tables(metadata):\n        metadata.drop_all(engine_sync)\n        metadata.create_all(engine_sync)\n    @staticmethod\n    def insert_data(workers_table):\n        with engine_sync.connect() as conn:\n            # stmt - insert / update/ delete\n            # сырой запрос:",
         "detail": "queries.core",
         "documentation": {}
     },
@@ -626,6 +682,24 @@
         "importPath": "models",
         "description": "models",
         "peekOfCode": "class ResumesOrm(Base):\n    __tablename__ = \"resumes\"\n    id: Mapped[intpk]\n    title: Mapped[str256]\n    compensation: Mapped[int | None]\n    workload: Mapped[Workload]\n    worker_id: Mapped[int] = mapped_column(ForeignKey(\"workers.id\", ondelete=\"CASCADE\"))\n    created_at: Mapped[created_at]\n    updated_at: Mapped[updated_at]",
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "metadata",
+        "kind": 5,
+        "importPath": "models",
+        "description": "models",
+        "peekOfCode": "metadata = MetaData()\nworkers_table = Table(\n    \"workers\",\n    metadata,\n    Column(\"id\", Integer, primary_key=True),\n    Column(\"username\", String),\n)\nintpk = Annotated[int, mapped_column(primary_key=True)]\ncreated_at = Annotated[\n    datetime,",
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "workers_table",
+        "kind": 5,
+        "importPath": "models",
+        "description": "models",
+        "peekOfCode": "workers_table = Table(\n    \"workers\",\n    metadata,\n    Column(\"id\", Integer, primary_key=True),\n    Column(\"username\", String),\n)\nintpk = Annotated[int, mapped_column(primary_key=True)]\ncreated_at = Annotated[\n    datetime,\n    mapped_column(",
         "detail": "models",
         "documentation": {}
     },

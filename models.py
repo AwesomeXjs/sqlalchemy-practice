@@ -1,22 +1,22 @@
-from datetime import datetime
 from enum import Enum
 from typing import Annotated
+from datetime import datetime
 
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, func, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, func, text
 
 from database import Base, str256
 
 # ИМПЕРАТИВНЫЙ ПОДХОД К ПОСТРОЕНИЮ МОДЕЛИ:
-# metadata = MetaData()
-#
-#
-# workers_table = Table(
-#     "workers",
-#     metadata,
-#     Column("id", Integer, primary_key=True),
-#     Column("username", String),
-# )
+metadata = MetaData()
+
+
+workers_table = Table(
+    "workers",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("username", String),
+)
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 created_at = Annotated[

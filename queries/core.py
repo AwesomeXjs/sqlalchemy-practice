@@ -1,6 +1,7 @@
 import queries
-from sqlalchemy import MetaData, insert, select
+from sqlalchemy import MetaData, insert, select, text, update
 
+from models import workers_table
 from database import engine_sync, engine_async
 
 
@@ -27,7 +28,6 @@ async def get_123_async():
 class SyncCore:
     @staticmethod
     def create_tables(metadata):
-        engine_sync.echo = False
         metadata.drop_all(engine_sync)
         metadata.create_all(engine_sync)
 
@@ -50,13 +50,34 @@ class SyncCore:
             conn.execute(stmt)
             conn.commit()
 
+    # SELECT
     @staticmethod
-    def select_workers(workers_table):
+    def select_workers(workers_table, var: str = "all"):
         with engine_sync.connect() as conn:
             query = select(workers_table)  # SELECT * FROM workers_table
-            result = conn.execute(query)
-            workers = result.all()
+            result = conn.execute(query)  # sqlalchemy возвращает итератор
+            if var == "one":
+                workers = result.first()
+            if var == "all":
+                workers = result.all()
             print(workers)
+
+    # UPDATE
+    @staticmethod
+    def update_worker(worker_id: int = 2, new_username: str = "Misha"):
+        with engine_sync.connect() as conn:
+            # СЫРОЙ UPDATE запрос:
+            # stmt = text(
+            #     "UPDATE workers SET username=:username WHERE id=:worker_id"
+            # )  # сырой запрос
+            # stmt = stmt.bindparams(username=new_username, worker_id=worker_id)
+            stmt = (
+                update(workers_table).values(username=new_username)
+                # .where(workers_table.id == worker_id)
+                .filter_by(id=worker_id)
+            )
+            conn.execute(stmt)
+            conn.commit()
 
 
 class AsyncCore:
