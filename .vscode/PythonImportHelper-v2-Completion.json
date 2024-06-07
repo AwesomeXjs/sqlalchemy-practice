@@ -81,6 +81,38 @@
         "documentation": {}
     },
     {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "cast",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "select",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -193,7 +225,7 @@
         "documentation": {}
     },
     {
-        "label": "ResumesOrm",
+        "label": "Workload",
         "importPath": "models",
         "description": "models",
         "isExtraImport": true,
@@ -217,6 +249,22 @@
         "documentation": {}
     },
     {
+        "label": "Base",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "ResumesOrm",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
         "label": "engine_sync",
         "importPath": "database",
         "description": "database",
@@ -233,7 +281,7 @@
         "documentation": {}
     },
     {
-        "label": "async_session_factory",
+        "label": "sync_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -242,6 +290,14 @@
     },
     {
         "label": "Base",
+        "importPath": "database",
+        "description": "database",
+        "isExtraImport": true,
+        "detail": "database",
+        "documentation": {}
+    },
+    {
+        "label": "sync_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -250,30 +306,6 @@
     },
     {
         "label": "engine_sync",
-        "importPath": "database",
-        "description": "database",
-        "isExtraImport": true,
-        "detail": "database",
-        "documentation": {}
-    },
-    {
-        "label": "sync_session_factory",
-        "importPath": "database",
-        "description": "database",
-        "isExtraImport": true,
-        "detail": "database",
-        "documentation": {}
-    },
-    {
-        "label": "Base",
-        "importPath": "database",
-        "description": "database",
-        "isExtraImport": true,
-        "detail": "database",
-        "documentation": {}
-    },
-    {
-        "label": "sync_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -492,7 +524,7 @@
         "kind": 6,
         "importPath": "queries.orm",
         "description": "queries.orm",
-        "peekOfCode": "class SyncORM:\n    @staticmethod\n    def create_tables():\n        # engine_sync.echo = False\n        Base.metadata.drop_all(engine_sync)\n        Base.metadata.create_all(engine_sync)\n    # insert (добавление) через орм.\n    @staticmethod\n    def insert_workers(\n        session_factory,",
+        "peekOfCode": "class SyncORM:\n    @staticmethod\n    def create_tables(Base, engine_sync):\n        # engine_sync.echo = False\n        Base.metadata.drop_all(engine_sync)\n        Base.metadata.create_all(engine_sync)\n    # insert (добавление) через орм.\n    @staticmethod\n    def insert_workers(\n        session_factory,",
         "detail": "queries.orm",
         "documentation": {}
     },
@@ -501,7 +533,7 @@
         "kind": 6,
         "importPath": "queries.orm",
         "description": "queries.orm",
-        "peekOfCode": "class AsyncORM:\n    @staticmethod\n    async def async_insert_data():\n        async with async_session_factory() as session:\n            worker = WorkersOrm(username=\"New Worker from orm\")\n            session.add(worker)\n            # resume = ResumesOrm(\n            #     title=\"New resume\",\n            #     compensation=23,\n            #     workload=\"parttime\",",
+        "peekOfCode": "class AsyncORM:\n    @staticmethod\n    async def async_insert_data(WorkersOrm, async_session_factory):\n        async with async_session_factory() as session:\n            worker = WorkersOrm(username=\"New Worker from orm\")\n            session.add(worker)\n            # resume = ResumesOrm(\n            #     title=\"New resume\",\n            #     compensation=23,\n            #     workload=\"parttime\",",
         "detail": "queries.orm",
         "documentation": {}
     },
@@ -627,7 +659,7 @@
         "kind": 5,
         "importPath": "database",
         "description": "database",
-        "peekOfCode": "engine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\nengine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=False,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
+        "peekOfCode": "engine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\nengine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
         "detail": "database",
         "documentation": {}
     },
@@ -636,7 +668,7 @@
         "kind": 5,
         "importPath": "database",
         "description": "database",
-        "peekOfCode": "engine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=False,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\n# запросы в бд всегда делаются через контекстный менеджер\n# SESSION:\n# Session - сессия нужна для транзакций в бд.\n# Когда мы входим в сессию мы открываем транзакцию, делаем набор каких то действий и закрываем транзакцию вызывая коммит.",
+        "peekOfCode": "engine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\n# запросы в бд всегда делаются через контекстный менеджер\n# SESSION:\n# Session - сессия нужна для транзакций в бд.\n# Когда мы входим в сессию мы открываем транзакцию, делаем набор каких то действий и закрываем транзакцию вызывая коммит.",
         "detail": "database",
         "documentation": {}
     },
@@ -656,6 +688,15 @@
         "description": "database",
         "peekOfCode": "async_session_factory = async_sessionmaker(engine_async)",
         "detail": "database",
+        "documentation": {}
+    },
+    {
+        "label": "resumes",
+        "kind": 5,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "resumes = [\n    {\n        \"title\": \"Python Developer\",\n        \"workload\": Workload.parttime,\n        \"compensation\": 100000,\n    },\n    {\n        \"title\": \"Java Script Developer\",\n        \"workload\": Workload.fulltime,\n        \"compensation\": 160000,",
+        "detail": "main",
         "documentation": {}
     },
     {

@@ -1,12 +1,10 @@
-from sqlalchemy import select, insert
-
-from models import WorkersOrm, ResumesOrm
-from database import async_session_factory, Base, engine_sync, sync_session_factory
+from database import sync_session_factory
+from sqlalchemy import Integer, and_, cast, func, select, insert
 
 
 class SyncORM:
     @staticmethod
-    def create_tables():
+    def create_tables(Base, engine_sync):
         # engine_sync.echo = False
         Base.metadata.drop_all(engine_sync)
         Base.metadata.create_all(engine_sync)
@@ -15,6 +13,7 @@ class SyncORM:
     @staticmethod
     def insert_workers(
         session_factory,
+        WorkersOrm,
         first_username: str,
         second_username: str,
     ):
@@ -28,14 +27,19 @@ class SyncORM:
             # Вариант для добавления одного элемента:
             # stmt = insert(table=WorkersOrm).values(username="Dima")
             # session.execute(stmt)
-            session.commit()
+            session.flush()  # отправляем измененеия в базу и еще не завершаем запрос
+            session.commit()  # отправляем изменения в базу и завершает запрос
 
     # SELECT
     @staticmethod
-    def select_workers(id: int = 1):
+    def select_workers(
+        sync_session_factory,
+        WorkersOrm,
+        id: int = 1,
+    ):
         with sync_session_factory() as session:
             # worker = session.get(WorkersOrm, id) - получаем одного работника
-            query = select(WorkersOrm)
+            query = select(WorkersOrm)  # SELECT * FROM WorkersOrm
             result = session.execute(query)
             # workers = (
             #     result.all()
@@ -48,16 +52,88 @@ class SyncORM:
 
     # UPDATE
     @staticmethod
-    def update_worker(worker_id: int = 2, new_username: str = "Misha"):
+    def update_worker(
+        sync_session_factory,
+        WorkersOrm,
+        new_username: str,
+        worker_id: int = 2,
+    ):
         with sync_session_factory() as session:
-            worker = session.get(WorkersOrm, worker_id)  # - получаем одного работника
-            worker.username = new_username
+            # СЫРОЙ UPDATE запрос:
+            # stmt = text(
+            #     "UPDATE workers SET username=:username WHERE id=:worker_id"
+            # )  # сырой запрос
+            # stmt = stmt.bindparams(username=new_username, worker_id=worker_id)
+            # session.execute(stmt)
+            # session.commit()
+
+            # запрос в стиле orm но мы делаем 2 запроса к бд (1й - запрашиваем воркера, 2й- изменяем его)
+            worker = session.get(
+                WorkersOrm, worker_id
+            )  # - получаем нужного работника из бд
+            worker.username = (
+                new_username  # просто изменяем (мутируем) экземпляр класса
+            )
+            # session.expire_all()  # сбрасывает изменения
+            session.refresh(worker)
+            # Принцип работы refresh: когда код доходит ДО рефреш - Python изменяет данные на те которые мы указали при изменении но они еще не отправили в бд. REFRESH запрашивает данные которые были ДО изменения и обновляет у нас локально их до исходных. Забирает последнее обновление с бд.
             session.commit()
+
+    @staticmethod
+    def insert_resumes(
+        sync_session_factory,
+        table,
+        title,
+        compensation,
+        workload,
+        worker_id,
+    ):
+        with sync_session_factory() as session:
+            resume = table(
+                compensation=compensation,
+                workload=workload,
+                title=title,
+                worker_id=worker_id,
+            )
+            session.add(resume)
+            session.commit()
+
+    #  считаем авг зарплату по каждому типу нагруженности (workload)
+    @staticmethod
+    def select_resumes_avg_compensation(
+        sync_session_factory, table, language: str = "Python"
+    ):
+        with sync_session_factory() as session:
+            # Выбери столбцы workload из resumes где указан в тайтле "Python" и зарплата выше 40000
+            # в итоге получим 2 ответа: авг по запрлате с нагруженностью fulltime и parttime
+            """SELECT workload, avg(compensation)::int as avg_compensation
+            from resumes
+            WHERE title like '%Python%' and compensation > 40000
+            group by workload
+            """
+
+            query = (
+                select(
+                    table.workload,
+                    cast(func.avg(table.compensation), Integer).label(
+                        "avg_compensation"
+                    ),
+                )
+                .select_from(table)
+                .filter(
+                    and_(table.title.contains(language)), table.compensation > 40000
+                )
+                .group_by(table.workload)
+            )
+            # print(query.compile(compile_kwargs={"literal_binds": True}))
+            res = session.execute(query)
+            result = res.all()
+            print(result)
 
 
 class AsyncORM:
     @staticmethod
-    async def async_insert_data():
+    async def async_insert_data(WorkersOrm, async_session_factory):
         async with async_session_factory() as session:
             worker = WorkersOrm(username="New Worker from orm")
             session.add(worker)
@@ -72,7 +148,7 @@ class AsyncORM:
 
     @staticmethod
     # Get запрос через орм
-    async def get_worker_by_id(id: int):
+    async def get_worker_by_id(async_session_factory, WorkersOrm, id: int):
         async with async_session_factory() as session:
             result = await session.get(WorkersOrm, id)
             print(result.username)
