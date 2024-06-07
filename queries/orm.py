@@ -1,6 +1,8 @@
 from database import sync_session_factory
 from sqlalchemy import Integer, and_, cast, func, select, insert
 
+from models import ResumesOrm, WorkersOrm
+
 
 class SyncORM:
     @staticmethod
@@ -104,8 +106,8 @@ class SyncORM:
         sync_session_factory, table, language: str = "Python"
     ):
         with sync_session_factory() as session:
-            # Выбери столбцы workload из resumes где указан в тайтле "Python" и зарплата выше 40000
-            # в итоге получим 2 ответа: авг по запрлате с нагруженностью fulltime и parttime
+            # Выбери строки workload из таблицы resumes где указан в тайтле "Python" и зарплата выше 40000
+            # в итоге получим 2 ответа: авг по запрлате с нагруженностью fulltime и parttime с "python" в тайтле
             """SELECT workload, avg(compensation)::int as avg_compensation
             from resumes
             WHERE title like '%Python%' and compensation > 40000
@@ -155,3 +157,18 @@ class AsyncORM:
         # query = select(WorkersOrm).where(WorkersOrm.id == id)
         # result = await session.execute(query)
         # print(result.scalar())
+
+    @staticmethod
+    async def insert_additional_resumes(
+        sync_session_factory,
+        table_workers,
+        table_resumes,
+        resumes,
+        workers,
+    ):
+        async with sync_session_factory() as session:
+            query_workers = insert(table_workers).values(workers)
+            query_resumes = insert(table_resumes).values(resumes)
+            await session.execute(query_workers)
+            await session.execute(query_resumes)
+            await session.commit()

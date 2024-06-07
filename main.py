@@ -1,8 +1,8 @@
 import asyncio
 
 from database import Base
-from database import sync_session_factory, engine_sync
 from queries import SyncCore, AsyncCore, SyncORM, AsyncORM
+from database import sync_session_factory, engine_sync, async_session_factory
 from models import WorkersOrm, Workload, workers_table, metadata, Base, ResumesOrm
 
 # SyncCore.create_tables(metadata)
@@ -31,36 +31,73 @@ SyncORM.update_worker(
     WorkersOrm=WorkersOrm,
     sync_session_factory=sync_session_factory,
 )
+workers = [
+    {"username": "Yan"},
+    {"username": "Alex"},
+    {"username": "Chris"},
+]
+
 
 resumes = [
     {
         "title": "Python Developer",
         "workload": Workload.parttime,
         "compensation": 100000,
+        "worker_id": 1,
     },
     {
         "title": "Java Script Developer",
         "workload": Workload.fulltime,
         "compensation": 160000,
+        "worker_id": 2,
     },
     {
         "title": "Python Developer",
+        "workload": Workload.parttime,
+        "compensation": 170000,
+        "worker_id": 3,
+    },
+    {
+        "title": "C++ Developer",
         "workload": Workload.fulltime,
-        "compensation": 130000,
+        "compensation": 120000,
+        "worker_id": 2,
+    },
+    {
+        "title": "C# Developer",
+        "workload": Workload.parttime,
+        "compensation": 190000,
+        "worker_id": 1,
+    },
+    {
+        "title": "Go Developer",
+        "workload": Workload.fulltime,
+        "compensation": 5000,
+        "worker_id": 3,
     },
 ]
 
 
-for el in resumes:
-    SyncORM.insert_resumes(
-        compensation=el.get("compensation"),
-        title=el.get("title"),
-        workload=el.get("workload"),
-        table=ResumesOrm,
-        sync_session_factory=sync_session_factory,
-        worker_id=2,
-    )
+# for el in resumes:
+#     SyncORM.insert_resumes(
+#         compensation=el.get("compensation"),
+#         title=el.get("title"),
+#         workload=el.get("workload"),
+#         table=ResumesOrm,
+#         sync_session_factory=sync_session_factory,
+#         worker_id=2,
+#     )
 
-SyncORM.select_resumes_avg_compensation(
-    table=ResumesOrm, sync_session_factory=sync_session_factory
+# SyncORM.select_resumes_avg_compensation(
+#     table=ResumesOrm, sync_session_factory=sync_session_factory
+# )
+
+asyncio.run(
+    AsyncORM.insert_additional_resumes(
+        sync_session_factory=async_session_factory,
+        table_resumes=ResumesOrm,
+        table_workers=WorkersOrm,
+        workers=workers,
+        resumes=resumes,
+    )
 )

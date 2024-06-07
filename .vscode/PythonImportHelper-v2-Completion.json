@@ -217,6 +217,22 @@
         "documentation": {}
     },
     {
+        "label": "ResumesOrm",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
+        "label": "WorkersOrm",
+        "importPath": "models",
+        "description": "models",
+        "isExtraImport": true,
+        "detail": "models",
+        "documentation": {}
+    },
+    {
         "label": "WorkersOrm",
         "importPath": "models",
         "description": "models",
@@ -306,6 +322,14 @@
     },
     {
         "label": "engine_sync",
+        "importPath": "database",
+        "description": "database",
+        "isExtraImport": true,
+        "detail": "database",
+        "documentation": {}
+    },
+    {
+        "label": "async_session_factory",
         "importPath": "database",
         "description": "database",
         "isExtraImport": true,
@@ -691,11 +715,20 @@
         "documentation": {}
     },
     {
+        "label": "workers",
+        "kind": 5,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "workers = [\n    {\"username\": \"Yan\"},\n    {\"username\": \"Alex\"},\n    {\"username\": \"Chris\"},\n]\nresumes = [\n    {\n        \"title\": \"Python Developer\",\n        \"workload\": Workload.parttime,\n        \"compensation\": 100000,",
+        "detail": "main",
+        "documentation": {}
+    },
+    {
         "label": "resumes",
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "resumes = [\n    {\n        \"title\": \"Python Developer\",\n        \"workload\": Workload.parttime,\n        \"compensation\": 100000,\n    },\n    {\n        \"title\": \"Java Script Developer\",\n        \"workload\": Workload.fulltime,\n        \"compensation\": 160000,",
+        "peekOfCode": "resumes = [\n    {\n        \"title\": \"Python Developer\",\n        \"workload\": Workload.parttime,\n        \"compensation\": 100000,\n        \"worker_id\": 1,\n    },\n    {\n        \"title\": \"Java Script Developer\",\n        \"workload\": Workload.fulltime,",
         "detail": "main",
         "documentation": {}
     },
