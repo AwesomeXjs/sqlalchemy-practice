@@ -209,8 +209,9 @@ class AsyncORM:
                     .cast(Integer)
                     .label("avg_workload_compensation"),
                 )
-                # .select_from(r)
-                .join(r, r.worker_id == w.id).subquery("helper1")
+                .select_from(r)
+                .join(w, r.worker_id == w.id)
+                .subquery("helper1")
             )
             cte = select(
                 subq.c.worker_id,
@@ -226,6 +227,7 @@ class AsyncORM:
 
             res = await session.execute(query)
             result = res.all()
-            print(result)
+            for el in result:
+                print(el)
 
             # print(query.compile(compile_kwargs={"literal_binds": True}))
