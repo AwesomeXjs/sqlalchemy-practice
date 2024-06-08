@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from sqlalchemy import create_engine, String
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from config import settings
@@ -19,7 +19,7 @@ class Base(DeclarativeBase):
 # ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы
 engine_sync = create_engine(
     url=settings.database_url_psycopg,
-    echo=True,
+    echo=False,
     pool_size=5,  # Максимум будет создано подключений при работае с алхимией
     max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено
 )

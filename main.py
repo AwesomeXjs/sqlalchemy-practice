@@ -17,25 +17,25 @@ from models import WorkersOrm, Workload, workers_table, metadata, Base, ResumesO
 # SyncCore.select_workers(workers_table)
 # SyncCore.update_worker(new_username="Dima")
 
-SyncORM.create_tables(engine_sync=engine_sync, Base=Base)
-SyncORM.insert_workers(
-    session_factory=sync_session_factory,
-    first_username="Dima",
-    second_username="Yo",
-    WorkersOrm=WorkersOrm,
-)
-# SyncORM.select_workers()
-SyncORM.update_worker(
-    new_username="Oleg",
-    worker_id=1,
-    WorkersOrm=WorkersOrm,
-    sync_session_factory=sync_session_factory,
-)
-workers = [
-    {"username": "Yan"},
-    {"username": "Alex"},
-    {"username": "Chris"},
-]
+# SyncORM.create_tables(engine_sync=engine_sync, Base=Base)
+# SyncORM.insert_workers(
+#     session_factory=sync_session_factory,
+#     first_username="Dima",
+#     second_username="Yo",
+#     WorkersOrm=WorkersOrm,
+# )
+# # SyncORM.select_workers()
+# SyncORM.update_worker(
+#     new_username="Oleg",
+#     worker_id=1,
+#     WorkersOrm=WorkersOrm,
+#     sync_session_factory=sync_session_factory,
+# )
+# workers = [
+#     {"username": "Yan"},
+#     {"username": "Alex"},
+#     {"username": "Chris"},
+# ]
 
 
 resumes = [
@@ -83,21 +83,23 @@ resumes = [
 #         compensation=el.get("compensation"),
 #         title=el.get("title"),
 #         workload=el.get("workload"),
-#         table=ResumesOrm,
+#         model=ResumesOrm,
 #         sync_session_factory=sync_session_factory,
-#         worker_id=2,
+#         worker_id=el.get("worker_id"),
 #     )
 
 # SyncORM.select_resumes_avg_compensation(
 #     table=ResumesOrm, sync_session_factory=sync_session_factory
 # )
 
-asyncio.run(
-    AsyncORM.insert_additional_resumes(
-        sync_session_factory=async_session_factory,
-        table_resumes=ResumesOrm,
-        table_workers=WorkersOrm,
-        workers=workers,
-        resumes=resumes,
-    )
-)
+# asyncio.run(
+#     AsyncORM.insert_additional_resumes(
+#         sync_session_factory=async_session_factory,
+#         table_resumes=ResumesOrm,
+#         table_workers=WorkersOrm,
+#         workers=workers,
+#         resumes=resumes,
+#     )
+# )
+
+asyncio.run(AsyncORM.join_cte_subquery_window_func(session=async_session_factory))

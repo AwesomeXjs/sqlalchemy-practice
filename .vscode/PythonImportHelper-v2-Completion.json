@@ -353,6 +353,62 @@
         "documentation": {}
     },
     {
+        "label": "aliased",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "DeclarativeBase",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "declared_attr",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "DeclarativeBase",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
         "label": "annotations",
         "importPath": "__future__",
         "description": "__future__",
@@ -417,46 +473,6 @@
         "description": "typing",
         "isExtraImport": true,
         "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "sessionmaker",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "DeclarativeBase",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "DeclarativeBase",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
         "documentation": {}
     },
     {
@@ -665,7 +681,7 @@
         "kind": 6,
         "importPath": "database",
         "description": "database",
-        "peekOfCode": "class Base(DeclarativeBase):\n    type_annotation_map = {\n        str256: String(256),\n    }\n# ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы\nengine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено",
+        "peekOfCode": "class Base(DeclarativeBase):\n    type_annotation_map = {\n        str256: String(256),\n    }\n# ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы\nengine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=False,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено",
         "detail": "database",
         "documentation": {}
     },
@@ -674,7 +690,7 @@
         "kind": 5,
         "importPath": "database",
         "description": "database",
-        "peekOfCode": "str256 = Annotated[str, 256]\nclass Base(DeclarativeBase):\n    type_annotation_map = {\n        str256: String(256),\n    }\n# ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы\nengine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
+        "peekOfCode": "str256 = Annotated[str, 256]\nclass Base(DeclarativeBase):\n    type_annotation_map = {\n        str256: String(256),\n    }\n# ENGINE нужен чтобы коннектится к нашей бд и делать какие то запросы\nengine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=False,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
         "detail": "database",
         "documentation": {}
     },
@@ -683,7 +699,7 @@
         "kind": 5,
         "importPath": "database",
         "description": "database",
-        "peekOfCode": "engine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\nengine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
+        "peekOfCode": "engine_sync = create_engine(\n    url=settings.database_url_psycopg,\n    echo=False,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией\n    max_overflow=10,  # максимум 10 доп подключений алхимия может еще создать если все 5 максимум подключений заполнено\n)\nengine_async = create_async_engine(\n    url=settings.database_url_asyncpg,\n    echo=True,\n    pool_size=5,  # Максимум будет создано подключений при работае с алхимией",
         "detail": "database",
         "documentation": {}
     },
@@ -712,15 +728,6 @@
         "description": "database",
         "peekOfCode": "async_session_factory = async_sessionmaker(engine_async)",
         "detail": "database",
-        "documentation": {}
-    },
-    {
-        "label": "workers",
-        "kind": 5,
-        "importPath": "main",
-        "description": "main",
-        "peekOfCode": "workers = [\n    {\"username\": \"Yan\"},\n    {\"username\": \"Alex\"},\n    {\"username\": \"Chris\"},\n]\nresumes = [\n    {\n        \"title\": \"Python Developer\",\n        \"workload\": Workload.parttime,\n        \"compensation\": 100000,",
-        "detail": "main",
         "documentation": {}
     },
     {

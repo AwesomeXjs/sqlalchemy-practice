@@ -1,3 +1,4 @@
+from sqlalchemy.orm import aliased
 from database import sync_session_factory
 from sqlalchemy import Integer, and_, cast, func, select, insert
 
@@ -84,14 +85,15 @@ class SyncORM:
     @staticmethod
     def insert_resumes(
         sync_session_factory,
-        table,
-        title,
+        model,
+        # **kwargs
         compensation,
+        title,
         workload,
         worker_id,
     ):
         with sync_session_factory() as session:
-            resume = table(
+            resume = model(
                 compensation=compensation,
                 workload=workload,
                 title=title,
@@ -172,3 +174,58 @@ class AsyncORM:
             await session.execute(query_workers)
             await session.execute(query_resumes)
             await session.commit()
+
+    @staticmethod
+    async def join_cte_subquery_window_func(
+        session,
+        like_language: str = "Python",
+    ):
+        # Задача: составить одну таблицу из двух где будут имена воркеров, их резюме с зарплатами и должна быть колонка насколько отклонена зарплата воркера от средней зарплаты по рынку
+        """
+        WITH helper2 AS (
+            SELECT *, compensation - avg_workload_compensation AS compensation_diff
+            FROM
+                (SELECT
+                    w.id,
+                    w.username,
+                    r.compensation,
+                    r.workload,
+                    avg(r.compensation) OVER (PARTITION BY workload)::int AS avg_workload_compensation
+                FROM resumes r
+                JOIN workers w ON r.worker_id = w.id) helper1
+            )
+            SELECT * FROM helper2
+            ORDER BY compensation_diff DESC
+        """
+        async with session() as session:
+            r = aliased(ResumesOrm)
+            w = aliased(WorkersOrm)
+            subq = (
+                select(
+                    r,
+                    w,
+                    func.avg(r.compensation)
+                    .over(partition_by=r.workload)
+                    .cast(Integer)
+                    .label("avg_workload_compensation"),
+                )
+                # .select_from(r)
+                .join(r, r.worker_id == w.id).subquery("helper1")
+            )
+            cte = select(
+                subq.c.worker_id,
+                subq.c.username,
+                subq.c.compensation,
+                subq.c.workload,
+                subq.c.avg_workload_compensation,
+                (subq.c.compensation - subq.c.avg_workload_compensation).label(
+                    "compensation_diff"
+                ),
+            ).cte("helper2")
+            query = select(cte).order_by(cte.c.compensation_diff.desc())
+
+            res = await session.execute(query)
+            result = res.all()
+            print(result)
+
+            # print(query.compile(compile_kwargs={"literal_binds": True}))
