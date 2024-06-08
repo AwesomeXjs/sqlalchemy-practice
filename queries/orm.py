@@ -1,5 +1,4 @@
-from sqlalchemy.orm import aliased
-from database import sync_session_factory
+from sqlalchemy.orm import aliased, joinedload, selectinload
 from sqlalchemy import Integer, and_, cast, func, select, insert
 
 from models import ResumesOrm, WorkersOrm
@@ -133,6 +132,51 @@ class SyncORM:
             res = session.execute(query)
             result = res.all()
             print(result)
+
+    # Проблема N + 1 - это когда мы подгружаем какие то сущности а потом чтобы посмотреть связаные с ними другие данные с другой таблицы делаем еще один запрос для подсущности этой сущности, чтобы например запросить резюме конкретного воркера.
+    # @staticmethod
+    # def select_workers_with_lazy_relationship(session, worker_model):
+    #     with session() as session:
+    #         query = select(worker_model)
+    #         res = session.execute(query)
+    #         result = res.scalars().all()
+    #         worker_1_resume = result[0].resumes
+    #         print(worker_1_resume)
+
+    #         worker_2_resume = result[1].resumes
+    #         print(worker_2_resume)
+
+    # joinload - подходит только для one2one или many2one. При использовании many2one - он будет подгружать много лишних данных которые будут дублироваться в таблице
+    # с помощью relationship можно отправить один большой запрос с нашими нужными сущностями и прикрепленными к ним подсущности с другой таблицы (resume)
+    @staticmethod
+    def select_workers_with_join_relationship(session, worker_model):
+        with session() as session:
+            query = select(worker_model).options(joinedload(worker_model.resumes))
+            res = session.execute(query)
+            result = (
+                res.unique().scalars().all()
+            )  # unique - чтобы не повторялись сущности с один айди
+            worker_1_resume = result[0].resumes
+            print(worker_1_resume)
+
+            worker_2_resume = result[1].resumes
+            print(worker_2_resume)
+
+    # selectin - используется для связки one2many или many2many
+    # при этом виде подгрузки мы подгружаем сначало всех воркеров а потом все резюме тех воркеров которые мы подгрузили
+    @staticmethod
+    def select_in_workers_with_join_relationship(session, worker_model):
+        with session() as session:
+            query = select(worker_model).options(selectinload(worker_model.resumes))
+            res = session.execute(query)
+            result = (
+                res.unique().scalars().all()
+            )  # unique - чтобы не повторялись сущности с один айди
+            worker_1_resume = result[0].resumes
+            print(worker_1_resume)
+
+            worker_2_resume = result[1].resumes
+            print(worker_2_resume)
 
 
 class AsyncORM:

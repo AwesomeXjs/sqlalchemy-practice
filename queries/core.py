@@ -1,4 +1,3 @@
-import queries
 from sqlalchemy import MetaData, insert, select, text, update
 
 from models import workers_table

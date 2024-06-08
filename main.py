@@ -102,4 +102,11 @@ resumes = [
 #     )
 # )
 
-asyncio.run(AsyncORM.join_cte_subquery_window_func(session=async_session_factory))
+# asyncio.run(AsyncORM.join_cte_subquery_window_func(session=async_session_factory))
+
+# SyncORM.select_workers_with_join_relationship(
+#     session=sync_session_factory, worker_model=WorkersOrm
+# )
+SyncORM.select_in_workers_with_join_relationship(
+    session=sync_session_factory, worker_model=WorkersOrm
+)
