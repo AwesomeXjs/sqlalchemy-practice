@@ -3,7 +3,18 @@ from typing import Annotated
 from datetime import datetime
 
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, func, text
+from sqlalchemy import (
+    func,
+    text,
+    Table,
+    Index,
+    Column,
+    String,
+    Integer,
+    MetaData,
+    ForeignKey,
+    CheckConstraint,
+)
 
 from database import Base, str256
 
@@ -19,6 +30,7 @@ workers_table = Table(
 )
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
+
 created_at = Annotated[
     datetime,
     mapped_column(
@@ -48,7 +60,19 @@ class WorkersOrm(Base):
     id: Mapped[intpk]
     username: Mapped[str]
 
-    resumes: Mapped[list["ResumesOrm"]] = relationship()
+    resumes: Mapped[list["ResumesOrm"]] = relationship(
+        back_populates="worker",
+        # backref="worker",  # backref - неявное указание на другой relationship (не рекомендуется)
+    )
+
+    # Если у нас связь one2many и мы не хотим подгружать очень много лишних данных для одного пользователя то мы можем создать отдельный relationship с нужным фильтром
+    resumes_parttime: Mapped[list["ResumesOrm"]] = relationship(
+        back_populates="worker",
+        # backref="worker",  # backref - неявное указание на другой relationship (не рекомендуется)
+        primaryjoin="and_(WorkersOrm.id == ResumesOrm.worker_id, ResumesOrm.workload == 'parttime')",
+        order_by="ResumesOrm.id.desc()",
+        # lazy="selectin",  # атрибут lazy будет неявно указывать каким способом нужно подгружать данные
+    )
 
 
 class ResumesOrm(Base):
@@ -62,4 +86,12 @@ class ResumesOrm(Base):
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
-    worker: Mapped["WorkersOrm"] = relationship()
+    worker: Mapped["WorkersOrm"] = relationship(back_populates="resumes")
+
+    __table_args__ = (
+        Index(
+            "title_index",
+            "title",
+        ),
+        CheckConstraint("compensation > 0", name="check_compensation_positive"),
+    )

@@ -38,44 +38,44 @@ from models import WorkersOrm, Workload, workers_table, metadata, Base, ResumesO
 # ]
 
 
-resumes = [
-    {
-        "title": "Python Developer",
-        "workload": Workload.parttime,
-        "compensation": 100000,
-        "worker_id": 1,
-    },
-    {
-        "title": "Java Script Developer",
-        "workload": Workload.fulltime,
-        "compensation": 160000,
-        "worker_id": 2,
-    },
-    {
-        "title": "Python Developer",
-        "workload": Workload.parttime,
-        "compensation": 170000,
-        "worker_id": 3,
-    },
-    {
-        "title": "C++ Developer",
-        "workload": Workload.fulltime,
-        "compensation": 120000,
-        "worker_id": 2,
-    },
-    {
-        "title": "C# Developer",
-        "workload": Workload.parttime,
-        "compensation": 190000,
-        "worker_id": 1,
-    },
-    {
-        "title": "Go Developer",
-        "workload": Workload.fulltime,
-        "compensation": 5000,
-        "worker_id": 3,
-    },
-]
+# resumes = [
+#     {
+#         "title": "Python Developer",
+#         "workload": Workload.parttime,
+#         "compensation": 100000,
+#         "worker_id": 1,
+#     },
+#     {
+#         "title": "Java Script Developer",
+#         "workload": Workload.fulltime,
+#         "compensation": 160000,
+#         "worker_id": 2,
+#     },
+#     {
+#         "title": "Python Developer",
+#         "workload": Workload.parttime,
+#         "compensation": 170000,
+#         "worker_id": 3,
+#     },
+#     {
+#         "title": "C++ Developer",
+#         "workload": Workload.fulltime,
+#         "compensation": 120000,
+#         "worker_id": 2,
+#     },
+#     {
+#         "title": "C# Developer",
+#         "workload": Workload.parttime,
+#         "compensation": 190000,
+#         "worker_id": 1,
+#     },
+#     {
+#         "title": "Go Developer",
+#         "workload": Workload.fulltime,
+#         "compensation": 5000,
+#         "worker_id": 3,
+#     },
+# ]
 
 
 # for el in resumes:
@@ -107,6 +107,14 @@ resumes = [
 # SyncORM.select_workers_with_join_relationship(
 #     session=sync_session_factory, worker_model=WorkersOrm
 # )
-SyncORM.select_in_workers_with_join_relationship(
-    session=sync_session_factory, worker_model=WorkersOrm
+# SyncORM.select_in_workers_with_join_relationship(
+#     session=sync_session_factory, worker_model=WorkersOrm
+# )
+
+# SyncORM.select_workers_with_cond_relationship(
+#     session=sync_session_factory, worker_table=WorkersOrm
+# )
+
+SyncORM.select_workers_with_cond_relationship_contains_eager(
+    session=sync_session_factory, worker_table=WorkersOrm, resume_table=ResumesOrm
 )

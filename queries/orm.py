@@ -1,5 +1,5 @@
-from sqlalchemy.orm import aliased, joinedload, selectinload
 from sqlalchemy import Integer, and_, cast, func, select, insert
+from sqlalchemy.orm import aliased, joinedload, selectinload, contains_eager
 
 from models import ResumesOrm, WorkersOrm
 
@@ -162,7 +162,7 @@ class SyncORM:
             worker_2_resume = result[1].resumes
             print(worker_2_resume)
 
-    # selectin - используется для связки one2many или many2many
+    # selectinload - используется для связки one2many или many2many
     # при этом виде подгрузки мы подгружаем сначало всех воркеров а потом все резюме тех воркеров которые мы подгрузили
     @staticmethod
     def select_in_workers_with_join_relationship(session, worker_model):
@@ -177,6 +177,57 @@ class SyncORM:
 
             worker_2_resume = result[1].resumes
             print(worker_2_resume)
+
+    # Запрос через отдельный relationship с нужными фильтрами
+    @staticmethod
+    def select_workers_with_cond_relationship(session, worker_table):
+        with session() as session:
+            query = select(worker_table).options(
+                selectinload(worker_table.resumes_parttime)
+            )
+            res = session.execute(query)
+            result = res.scalars().all()
+            print(result)
+
+    # contains_eager
+    @staticmethod
+    def select_workers_with_cond_relationship_contains_eager(
+        session, worker_table, resume_table
+    ):
+        with session() as session:
+            query = (
+                select(worker_table)
+                .join(worker_table.resumes)
+                .options(contains_eager(worker_table.resumes))
+                .filter(resume_table.workload == "parttime")
+            )
+            res = session.execute(query)
+            result = res.unique().scalars().all()
+            print(result)
+
+    @staticmethod
+    def select_workers_with_cond_relationship_contains_eager_with_limit(
+        session, worker_table, resume_table
+    ):
+        with session() as session:
+            subq = (
+                select(resume_table.id.label("parttime_resume_id"))
+                .filter(resume_table.worker_id == worker_table.id)
+                .order_by(worker_table.id.desc())
+                .limit(2)  # Мы хотим только одно резюме у каждого работника
+                .scalar_subquery()
+                .correlate(worker_table)
+            )
+
+            query = (
+                select(worker_table)
+                .join(resume_table, resume_table.id.in_(subq))
+                .options(contains_eager(worker_table.resumes))
+            )
+
+            res = session.execute(query)
+            result = res.unique().scalars().all()
+            print(result)
 
 
 class AsyncORM:
