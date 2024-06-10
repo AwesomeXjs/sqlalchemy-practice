@@ -1,7 +1,13 @@
+from pydantic import BaseModel
 from sqlalchemy import Integer, and_, cast, func, select, insert
 from sqlalchemy.orm import aliased, joinedload, selectinload, contains_eager
 
-from models import ResumesOrm, WorkersOrm
+from models import ResumesOrm, WorkersOrm, Workload
+
+
+class WorkloadAvgComp(BaseModel):
+    workload: Workload
+    avg_compensation: int
 
 
 class SyncORM:
@@ -127,11 +133,18 @@ class SyncORM:
                     and_(table.title.contains(language)), table.compensation > 40000
                 )
                 .group_by(table.workload)
+                .having(func.avg(table.compensation) > 70000)
             )
             # print(query.compile(compile_kwargs={"literal_binds": True}))
             res = session.execute(query)
-            result = res.all()
-            print(result)
+            result_orm = res.all()
+            print(result_orm)
+            # Приведение ответа алхимии к pydantic модели
+            result_dto = [
+                WorkloadAvgComp.model_validate(row, from_attributes=True)
+                for row in result_orm
+            ]
+            print(result_dto[0].avg_compensation)
 
     # Проблема N + 1 - это когда мы подгружаем какие то сущности а потом чтобы посмотреть связаные с ними другие данные с другой таблицы делаем еще один запрос для подсущности этой сущности, чтобы например запросить резюме конкретного воркера.
     # @staticmethod
@@ -189,7 +202,7 @@ class SyncORM:
             result = res.scalars().all()
             print(result)
 
-    # contains_eager
+    # contains_eager - подгружает только пользователей у которых есть parttime
     @staticmethod
     def select_workers_with_cond_relationship_contains_eager(
         session, worker_table, resume_table
@@ -228,6 +241,36 @@ class SyncORM:
             res = session.execute(query)
             result = res.unique().scalars().all()
             print(result)
+
+    # m2m добавление вакансии
+    @staticmethod
+    def add_vacancies(session, resume_table, vacancy_table):
+        with session() as session:
+            new_vacancy = vacancy_table(title="Python", compensation=120000)
+
+            resume1 = session.get(resume_table, 1)
+            resume2 = session.get(resume_table, 2)
+
+            resume1.replied_from_vacancy.append(new_vacancy)
+            resume2.replied_from_vacancy.append(new_vacancy)
+            session.commit()
+
+    @staticmethod
+    def select_resumes_with_all_relationships(session, resume_table, vacancy_table):
+        with session() as session:
+            query = (
+                select(resume_table)
+                .options(joinedload(resume_table.worker))  # one2many запрос
+                .options(
+                    selectinload(resume_table.replied_from_vacancy).load_only(
+                        vacancy_table.title
+                    )
+                )  # m2m запрос
+            ).order_by(resume_table.id)
+
+            res = session.execute(query)
+            result = res.unique().scalars().all()
+            print(f"{result=}")
 
 
 class AsyncORM:

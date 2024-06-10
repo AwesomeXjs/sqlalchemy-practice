@@ -34,7 +34,7 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 created_at = Annotated[
     datetime,
     mapped_column(
-        server_default=text("TIMEZONE('utc', now())"),
+        server_default=text("TIMEZONE('utc', now() + interval '1day')"),
         default=datetime.utcnow,
     ),
 ]
@@ -88,6 +88,10 @@ class ResumesOrm(Base):
 
     worker: Mapped["WorkersOrm"] = relationship(back_populates="resumes")
 
+    replied_from_vacancy: Mapped[list["VacansiesOrm"]] = relationship(
+        back_populates="resumes_replied", secondary="vacancies_replies"
+    )
+
     __table_args__ = (
         Index(
             "title_index",
@@ -95,3 +99,29 @@ class ResumesOrm(Base):
         ),
         CheckConstraint("compensation > 0", name="check_compensation_positive"),
     )
+
+
+class VacansiesOrm(Base):
+    __tablename__ = "vacancies"
+
+    id: Mapped[intpk]
+    title: Mapped[str256]
+    compensation: Mapped[int | None]
+
+    resumes_replied: Mapped[list["ResumesOrm"]] = relationship(
+        back_populates="replied_from_vacancy", secondary="vacancies_replies"
+    )
+
+
+class VanaciesRepliesOrm(Base):
+    __tablename__ = "vacancies_replies"
+    resume_id: Mapped[int] = mapped_column(
+        ForeignKey("resumes.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    vacancy_id: Mapped[int] = mapped_column(
+        ForeignKey("vacancies.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    cover_letter: Mapped[str | None]
